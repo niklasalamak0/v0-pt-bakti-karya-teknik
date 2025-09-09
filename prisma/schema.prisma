@@ -1,0 +1,146 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("POSTGRES_PRISMA_URL")
+}
+
+model Contact {
+  id           String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  name         String   @db.VarChar(255)
+  email        String   @db.VarChar(255)
+  phone        String?  @db.VarChar(50)
+  company      String?  @db.VarChar(255)
+  serviceType  ServiceType @map("service_type")
+  message      String   @db.Text
+  status       ContactStatus @default(NEW)
+  isPublished  Boolean  @default(true) @map("is_published")
+  createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt    DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  @@map("contacts")
+}
+
+model Service {
+  id          String      @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  title       String      @db.VarChar(255)
+  description String      @db.Text
+  category    ServiceCategory
+  icon        String?     @db.VarChar(100)
+  features    String[]
+  priceRange  String?     @map("price_range") @db.VarChar(100)
+  isFeatured  Boolean     @default(false) @map("is_featured")
+  isPublished Boolean     @default(true) @map("is_published")
+  sortOrder   Int         @default(0) @map("sort_order")
+  createdAt   DateTime    @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt   DateTime    @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  @@map("services")
+}
+
+model Portfolio {
+  id            String      @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  title         String      @db.VarChar(255)
+  description   String      @db.Text
+  category      ServiceCategory
+  clientName    String?     @map("client_name") @db.VarChar(255)
+  projectDate   DateTime?   @map("project_date") @db.Date
+  location      String?     @db.VarChar(255)
+  imageUrl      String?     @map("image_url") @db.Text
+  galleryUrls   String[]    @map("gallery_urls")
+  technologies  String[]
+  projectValue  Decimal?    @map("project_value") @db.Decimal(15, 2)
+  durationMonths Int?       @map("duration_months")
+  isFeatured    Boolean     @default(false) @map("is_featured")
+  isPublished   Boolean     @default(true) @map("is_published")
+  sortOrder     Int         @default(0) @map("sort_order")
+  createdAt     DateTime    @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt     DateTime    @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  @@map("portfolios")
+}
+
+model Testimonial {
+  id              String      @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  clientName      String      @map("client_name") @db.VarChar(255)
+  clientPosition  String?     @map("client_position") @db.VarChar(255)
+  clientCompany   String      @map("client_company") @db.VarChar(255)
+  testimonial     String      @db.Text
+  rating          Int?        @db.Integer
+  projectType     ServiceCategory? @map("project_type")
+  clientAvatarUrl String?     @map("client_avatar_url") @db.Text
+  isFeatured      Boolean     @default(false) @map("is_featured")
+  isPublished     Boolean     @default(true) @map("is_published")
+  sortOrder       Int         @default(0) @map("sort_order")
+  createdAt       DateTime    @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt       DateTime    @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  @@map("testimonials")
+}
+
+model PricingPackage {
+  id              String      @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  name            String      @db.VarChar(255)
+  description     String?     @db.Text
+  category        ServiceCategory
+  price           Decimal     @db.Decimal(15, 2)
+  priceUnit       String      @default("project") @map("price_unit") @db.VarChar(50)
+  features        String[]
+  isPopular       Boolean     @default(false) @map("is_popular")
+  isCustom        Boolean     @default(false) @map("is_custom")
+  minProjectValue Decimal?    @map("min_project_value") @db.Decimal(15, 2)
+  maxProjectValue Decimal?    @map("max_project_value") @db.Decimal(15, 2)
+  isPublished     Boolean     @default(true) @map("is_published")
+  sortOrder       Int         @default(0) @map("sort_order")
+  createdAt       DateTime    @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt       DateTime    @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  @@map("pricing_packages")
+}
+
+model BrandPartner {
+  id                  String      @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  name                String      @db.VarChar(255)
+  logoUrl             String      @map("logo_url") @db.Text
+  websiteUrl          String?     @map("website_url") @db.Text
+  partnerType         PartnerType @map("partner_type")
+  description         String?     @db.Text
+  collaborationSince  DateTime?   @map("collaboration_since") @db.Date
+  isFeatured          Boolean     @default(false) @map("is_featured")
+  isPublished         Boolean     @default(true) @map("is_published")
+  sortOrder           Int         @default(0) @map("sort_order")
+  createdAt           DateTime    @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt           DateTime    @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  @@map("brand_partners")
+}
+
+enum ServiceType {
+  advertising
+  building_me
+  both
+}
+
+enum ServiceCategory {
+  advertising
+  building_me
+}
+
+enum ContactStatus {
+  new
+  contacted
+  in_progress
+  completed
+  cancelled
+
+  @@map("ContactStatus")
+}
+
+enum PartnerType {
+  client
+  supplier
+  technology
+  certification
+}
